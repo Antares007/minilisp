@@ -95,7 +95,7 @@ run macro 7 '(defmacro seven () 7) ((lambda () (seven)))'
 
 run macroexpand '(if (= x 0) (print x))' "
   (defmacro if-zero (x then) (list 'if (list '= x 0) then))
-  (macroexpand (if-zero x (print x)))"
+  (mexpand (if-zero x (print x)))"
 
 # Sum from 0 to 10
 run recursion 55 '(defun f (x) (if (= x 0) 0 (+ (f (+ x -1)) x))) (f 10)'

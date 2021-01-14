@@ -226,6 +226,10 @@ static Obj *read_list(void) {
 // May create a new symbol. If there's a symbol with the same name, it will not
 // create a new symbol but return the existing one.
 static Obj *intern(char *name) {
+  if (strlen(name) > 8) {
+    printf("symbol '%s length > 8", name);
+    exit(9);
+  }
   for (Obj *p = Symbols; p != Nil; p = p->cdr)
     if (strcmp(name, p->car->name) == 0)
       return p->car;
@@ -624,7 +628,7 @@ static void define_primitives(Obj *env) {
   add_primitive(env, "define", prim_define);
   add_primitive(env, "defun", prim_defun);
   add_primitive(env, "defmacro", prim_defmacro);
-  add_primitive(env, "macroexpand", prim_macroexpand);
+  add_primitive(env, "mexpand", prim_macroexpand);
   add_primitive(env, "lambda", prim_lambda);
   add_primitive(env, "if", prim_if);
   add_primitive(env, "=", prim_num_eq);
