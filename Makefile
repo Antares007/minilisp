@@ -1,4 +1,4 @@
-CFLAGS=-std=gnu99 -g -Wall
+CFLAGS=-std=gnu99 -g -Wall $(UFLAGS)
 
 .PHONY: clean test
 
@@ -9,3 +9,6 @@ clean:
 
 test: minilisp
 	@./test.sh
+
+%.dump: %.o
+	objdump -d -Mintel $<
