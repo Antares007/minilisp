@@ -19,7 +19,6 @@ typedef uint64_t Quad;
 typedef int (*fun)();
 #include <stdio.h>
 typedef int (*next_f)();
-#define Lrror pith(-1, 0, 0, ret)
 
 N(symbol) {
   S(unsigned char, current);
@@ -33,15 +32,13 @@ N(symbol) {
     while ((current = next()) && (Range('A', 'Z') || Range('0', '9')))
       (AP(char, current), len++);
   } else
-    Lrror;
+    L;
 }
 
-NN(a, symbol) {
+Nps(a, symbol) {
   S(unsigned char, current);
   S(next_f, next);
-  B;
-  A(char *, "hello world");
-  O;
+  O(A(char *, "hello world"));
 }
 }
 // static void read(void o(), char current, int next(), void *begin, void *end,
@@ -67,11 +64,10 @@ NN(a, symbol) {
 //  printf("%p %p\n", begin, end);
 //  loop(o, begin += 1, end += 2);
 //}
-NPith(p) {}
+Npith(p) {}
 int main() {
   // loop(p, 0, 0);
-
-  aosymbol(p, 0, 0, 0);
+  a(p, 0, 0, 0);
   char *s = "obar";
   unsigned long int id =
       ((unsigned int)s[0] << 3 * 8) | ((unsigned int)s[1] << 2 * 8) |

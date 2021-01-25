@@ -9,7 +9,7 @@ typedef void (*pith_t)(int, void *, void *, void *);
 #define Npith(n)                                                               \
   static void n(int errcode, void *begin, void *anchor, void *ret)
 
-#define Ps(n, nara)                                                            \
+#define Nps(n, nara)                                                            \
   Npith(CC(n, _pith));                                                         \
   N(n) { nara(CC(n, _pith), begin, anchor, (void *[]){pith, ret}); }           \
   Npith(CC(n, _pith)) {                                                        \
@@ -62,5 +62,5 @@ typedef void (*pith_t)(int, void *, void *, void *);
   pith(0, oa, anchor, ret);                                                    \
   anchor = oa;                                                                 \
   }
-#define M(...) MB;(__VA_ARGS__);ME
+#define O(...) MB;(__VA_ARGS__);ME
 #define L return pith(-1, begin, anchor, ret)
