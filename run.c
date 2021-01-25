@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <sys/mman.h>
 
-NarGo(start) {
+N(start) {
   size_t size = 1 << 20;
   void *a =
       mmap((void *)0x0000666000000000, size, PROT_READ | PROT_WRITE | PROT_EXEC,
@@ -36,7 +36,7 @@ void writecell(void *a, void *h, void *t, char type) {
   *(uint16_t *)(a + 0x16) = 0xe7ff;
 }
 
- NarGoPith(pith) {
+ Npith(pith) {
   for (int i = 0; 1; i++) {
     if (i < 2)
       writecell(begin + i * 0x18, (void *)'a' + i, begin + (i + 1) * 0x18, 'A' + i);
@@ -83,17 +83,17 @@ void cstr(void o(), char c, int n()) {
 
 #define Rend current == -1
 #define RendOerror current < 0
-#define A(T, v) (*(T *)begin = (T)current, begin += sizeof(T))
+#define Ap(T, v) (*(T *)begin = (T)current, begin += sizeof(T))
 
 void symbol(void o(), char current, int next(), void *begin, void *end,
           void *ret) {
   while (Rws)
     current = next();
   if (Range('A', 'Z')) {
-    A(char, current);
+    Ap(char, current);
     size_t len=0;
     while ((current = next()) && (Range('A', 'Z') || Range('0', '9'))) 
-      (A(char, current),len++);
+      (Ap(char, current),len++);
   } else
     o(ret, 'L');
 }

@@ -1,22 +1,18 @@
 // RDI, RSI, RDX, RCX, R8, R9
 #include "a.h"
-N(nara) {
-  //B;
-  //A(int,42);
-  //O;
-  pith(-1,begin,anchor,ret);
-}
-N(narb) {
-  B;
-  A(int,43);
-  O;
-}
 
-NoN(ab,nara,narb);
+N(narb) {
+  M(A(int, 1), A(int, 2), A(int, 3));
+}
+N(err) {
+  L;
+}
+Nor(ab, err, narb);
+
 #include <stdio.h>
 #include <stdlib.h>
 
-NPith(p) {
+Npith(p) {
   for (int i = 0; i < 9; i++) {
     S(int, v);
     printf("%d ", v);
