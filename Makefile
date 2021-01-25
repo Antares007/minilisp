@@ -1,4 +1,4 @@
-CFLAGS=-std=gnu99 -g -Wall $(UFLAGS)
+CFLAGS=-std=gnu99 -g -Wall -Wno-multichar $(UFLAGS)
 
 .PHONY: clean test
 
