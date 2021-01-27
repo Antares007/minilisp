@@ -1,79 +1,75 @@
+#include "t.h"
 #include "a.h"
-#define Rws                                                                    \
-  current == ' ' || current == '\n' || current == '\r' || current == '\t'
+#define R1of4(a, b, c, d)                                                      \
+  (current == (unsigned char)a || current == (unsigned char)b ||               \
+   current == (unsigned char)c || current == (unsigned char)d)
+#define R0of4(a, b, c, d)                                                      \
+  (current != (unsigned char)a && current != (unsigned char)b &&               \
+   current != (unsigned char)c && current != (unsigned char)d)
+#define Rand(a, b) (a <= current && current <= b)
+#define Ror(a, b) (current < a || b < current)
+#define Req(a) (current == a)
 #define Rend current == -1
-#define RendOerror current < 0
+#define Rerror current < 0
+#define Shift (current = getchar())
+#define Shiftws                                                                \
+  while (R1of4(' ', '\n', '\r', '\t'))                                         \
+  Shift
 #define AP(T, v) (*(T *)begin = (T)current, begin += sizeof(T))
-#define Range(a, b) (a <= current && current <= b)
-
-#include <stdint.h>
-typedef int8_t byte;
-typedef int16_t word;
-typedef int32_t doub;
-typedef int64_t quad;
-typedef void *star;
-typedef uint8_t Byte;
-typedef uint16_t Word;
-typedef uint32_t Doub;
-typedef uint64_t Quad;
-typedef int (*fun)();
 #include <stdio.h>
-typedef int (*next_f)();
+static int current;
 
+// Ab0
 N(symbol) {
-  S(unsigned char, current);
-  S(next_f, next);
-
-  while (Rws)
-    current = next();
-  if (Range('A', 'Z')) {
-    AP(char, current);
-    size_t len = 0;
-    while ((current = next()) && (Range('A', 'Z') || Range('0', '9')))
-      (AP(char, current), len++);
+  Shiftws;
+  if (Rand('A', 'Z') || Rand('a', 'z')) {
+    unsigned long int symb = current & 0xff;
+    char c = 1;
+    while (Shift && (Rand('A', 'Z') || Rand('a', 'z') || Rand('0', '9'))) {
+      if (c == 8)
+        Leturn;
+      symb = symb | ((current & 0xff) << 8 * c);
+      c++;
+    }
+    O(A(unsigned long int, 'symb'), A(unsigned long int, symb));
   } else
-    L;
+    Leturn;
 }
-
-Nps(a, symbol) {
-  S(unsigned char, current);
-  S(next_f, next);
-  O(A(char *, "hello world"));
+// ( sexp ... sexp )
+Norps(sexp, symbol) {
+  Shiftws;
+  if (Req('(')) {
+    Shift;
+    Shiftws;
+    if (Req(')')) {
+    } else {
+      O(A(unsigned long int, 'cons'), A(void *, sexp), A(void *, sexp));
+    }
+  } else
+    Leturn;
 }
+NEnd;
+Npith(eval) {
+  S(unsigned long int, type);
+  if (type == 'cons') {
+    S(void *, head);
+    S(void *, tail);
+    printf("cons %p %p\n", head, tail);
+  } else if (type == 'symb') {
+    S(unsigned long int, symbol);
+    printf("symb %s\n", (char *)&symbol);
+  } else {
+    printf("bug\n");
+  }
 }
-// static void read(void o(), char current, int next(), void *begin, void *end,
-//                 void *ret) {
-//  o(ret, 's', 'abcd');
-//}
-// typedef void (*n_t)();
-// static void foreadpith(void *op, short type, int value) {
-//  if (type == 'L')
-//    ((n_t)op)(op, type, value);
-//  else {
-//  }
-//}
-// static void foread(void o(), char current, int next(), void *begin, void
-// *end,
-//                   void *ret) {
-//  read((n_t)foreadpith, current, next, begin, end, o);
-//}
-//
-// static void loop(void o(), void *begin, void *end) {}
-////#include <stdio.h>
-// static void p(void *o, void *begin, void *end) {
-//  printf("%p %p\n", begin, end);
-//  loop(o, begin += 1, end += 2);
-//}
-Npith(p) {}
+#include "beginend.h"
+//#include "hexdump.h"
+#include <stdlib.h>
 int main() {
-  // loop(p, 0, 0);
-  a(p, 0, 0, 0);
-  char *s = "obar";
-  unsigned long int id =
-      ((unsigned int)s[0] << 3 * 8) | ((unsigned int)s[1] << 2 * 8) |
-      ((unsigned int)s[2] << 1 * 8) | ((unsigned int)s[3] << 0 * 8);
-  unsigned long int id2 = 'haha';
-  printf("%s\n", (char *)&id);
-  printf("%s\n", (char *)&id2);
-  return 0;
+  int err = 0;
+  Begin(1024);
+  Shift;
+  sexp(eval, begin, anchor, &err);
+  End;
+  return err;
 }
