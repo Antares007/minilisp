@@ -1,5 +1,6 @@
 #include "t.h"
 #include "a.h"
+#include <sys/types.h>
 #define R1of4(a, b, c, d)                                                      \
   (current == (unsigned char)a || current == (unsigned char)b ||               \
    current == (unsigned char)c || current == (unsigned char)d)
@@ -23,53 +24,108 @@ static int current;
 N(symbol) {
   Shiftws;
   if (Rand('A', 'Z') || Rand('a', 'z')) {
-    unsigned long int symb = current & 0xff;
-    char c = 1;
-    while (Shift && (Rand('A', 'Z') || Rand('a', 'z') || Rand('0', '9'))) {
+    Quad symb = current & 0xff;
+    byte c = 1;
+    Shift;
+    while (Rand('A', 'Z') || Rand('a', 'z') || Rand('0', '9')) {
       if (c == 8)
         Leturn;
-      symb = symb | ((current & 0xff) << 8 * c);
+      symb = symb | ((Quad)(current & 0xff) << (8 * c));
       c++;
+      Shift;
     }
-    O(A(unsigned long int, 'symb'), A(unsigned long int, symb));
+    O(A(Word, 0xbe48), // mov rsi,
+      A(Quad, 'symb'), //
+      A(Word, 0xba48), // mov rdx,
+      A(Quad, symb),   //
+      A(Word, 0xe7ff)  // jmp rdi
+    );
   } else
     Leturn;
 }
+
+static void slist(pith_t, void *, void *, void *);
 // ( sexp ... sexp )
 Norps(sexp, symbol) {
   Shiftws;
   if (Req('(')) {
     Shift;
     Shiftws;
-    if (Req(')')) {
-    } else {
-      O(A(unsigned long int, 'cons'), A(void *, sexp), A(void *, sexp));
-    }
+    if (Req(')'))
+      Shift;
+    else
+      O(A(Quad, 'cons'), A(void *, sexp), A(void *, slist))
   } else
     Leturn;
 }
 NEnd;
+Norps(slist, sexp) {
+  Shiftws;
+  if (Req(')'))
+    Shift;
+  else
+    Leturn;
+}
+NEnd;
+// S_ ::= S_ a / b
+N(ws) {
+  Shiftws;
+  pith(0, begin, anchor, ret);
+}
+Nandps(aaa, ws) {
+  if (Req('a')) {
+    Shift;
+    O(A(int, 1));
+    aaa(pith, begin, anchor, ret);
+  } else
+    Leturn;
+}
+NEnd;
+
+Nandps(S_, ws) {
+  if (Req('b')) {
+    O(A(int, 0));
+    Shift;
+    aaa(pith, begin, anchor, ret);
+    // Shiftws;
+    // while (Req('a')) {
+    //  O(A(int, 1));
+    //  Shift;
+    //  Shiftws;
+    //}
+  } else
+    Leturn;
+}
+NEnd;
+// N(cons) {}
+typedef void (*n_t)(pith_t, void *, void *, void *);
 Npith(eval) {
-  S(unsigned long int, type);
+  S(Quad, type);
   if (type == 'cons') {
-    S(void *, head);
-    S(void *, tail);
+    S(n_t, head);
+    S(n_t, tail);
     printf("cons %p %p\n", head, tail);
+    head(eval, anchor, anchor, ret);
+    tail(eval, anchor, anchor, ret);
   } else if (type == 'symb') {
-    S(unsigned long int, symbol);
+    S(Quad, symbol);
     printf("symb %s\n", (char *)&symbol);
   } else {
-    printf("bug\n");
+    printf("syntax error\n");
   }
 }
 #include "beginend.h"
-//#include "hexdump.h"
+#include "hexdump.h"
 #include <stdlib.h>
+void (*pith)() = hexdump;
+void SS(pith_t pith, void *b, void *a, void *r) { S_(pith, b, a, r); }
 int main() {
   int err = 0;
-  Begin(1024);
+  Begin(4096);
   Shift;
-  sexp(eval, begin, anchor, &err);
-  End;
+  SS(hexdump, begin, anchor, &err);
+  End(4096);
+  if (err)
+    printf("error\n");
   return err;
 }

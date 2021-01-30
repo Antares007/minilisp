@@ -1,3 +1,4 @@
+CC=clang
 CFLAGS=-std=gnu99 -g -Wall -Wno-multichar $(UFLAGS)
 
 .PHONY: clean test
