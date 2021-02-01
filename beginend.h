@@ -7,7 +7,7 @@
                        MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, 0, 0);         \
     if (begin == (void *)-1)                                                       \
       exit(9);                                              \
-    void *anchor = begin;                                                      \
+    void *end = begin;                                                      \
     for (int i = 0; i < size; i++)                                             \
       ((char *)begin)[i] = 0xcc;
 

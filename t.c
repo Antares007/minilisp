@@ -1,5 +1,5 @@
 #include "t.h"
-#include "a.h"
+#include "n.h"
 #include <sys/types.h>
 #define R1of4(a, b, c, d)                                                      \
   (current == (unsigned char)a || current == (unsigned char)b ||               \
@@ -34,7 +34,7 @@ N(symbol) {
       c++;
       Shift;
     }
-    O(A(Word, 0xbe48), // mov rsi,
+    o(A(Word, 0xbe48), // mov rsi,
       A(Quad, 'symb'), //
       A(Word, 0xba48), // mov rdx,
       A(Quad, symb),   //
@@ -54,7 +54,7 @@ Norps(sexp, symbol) {
     if (Req(')'))
       Shift;
     else
-      O(A(Quad, 'cons'), A(void *, sexp), A(void *, slist))
+      o(A(Quad, 'cons'), A(void *, sexp), A(void *, slist))
   } else
     Leturn;
 }
@@ -70,13 +70,13 @@ NEnd;
 // S_ ::= S_ a / b
 N(ws) {
   Shiftws;
-  pith(0, begin, anchor, ret);
+  pith(0, begin, end, ret);
 }
 Nandps(aaa, ws) {
   if (Req('a')) {
     Shift;
-    O(A(int, 1));
-    aaa(pith, begin, anchor, ret);
+    o(A(int, 1));
+    aaa(pith, begin, end, ret);
   } else
     Leturn;
 }
@@ -84,12 +84,12 @@ NEnd;
 
 Nandps(S_, ws) {
   if (Req('b')) {
-    O(A(int, 0));
+    o(A(int, 0));
     Shift;
-    aaa(pith, begin, anchor, ret);
+    aaa(pith, begin, end, ret);
     // Shiftws;
     // while (Req('a')) {
-    //  O(A(int, 1));
+    //  o(A(int, 1));
     //  Shift;
     //  Shiftws;
     //}
@@ -105,8 +105,8 @@ Npith(eval) {
     S(n_t, head);
     S(n_t, tail);
     printf("cons %p %p\n", head, tail);
-    head(eval, anchor, anchor, ret);
-    tail(eval, anchor, anchor, ret);
+    head(eval, end, end, ret);
+    tail(eval, end, end, ret);
   } else if (type == 'symb') {
     S(Quad, symbol);
     printf("symb %s\n", (char *)&symbol);
@@ -123,7 +123,7 @@ int main() {
   int err = 0;
   Begin(4096);
   Shift;
-  SS(hexdump, begin, anchor, &err);
+  SS(hexdump, begin, end, &err);
   End(4096);
   if (err)
     printf("error\n");
